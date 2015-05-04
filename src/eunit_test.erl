@@ -66,16 +66,24 @@ prune_trace([], Tail) ->
 %% @throws wrapperError()
 
 run_testfun(F) ->
-    try
-	F()
-    of Value ->
-	    {ok, Value}
-    catch
-	{eunit_internal, Term} ->
-	    %% Internally generated: re-throw Term (lose the trace)
-	    throw(Term);
-	Class:Reason ->
-	    {error, {Class, Reason, get_stacktrace()}}
+    Info = erlang:fun_info(F),
+    %io:format(user,"Info=~p~n",[Info]),
+    case proplists:get_value(env,Info) of
+	[] ->
+	    R = dteste_eunit:test(F,Info),
+	    {ok,R};
+	_ ->
+	    try
+		F()
+	    of Value ->
+		    {ok, Value}
+	    catch
+		{eunit_internal, Term} ->
+		    %% Internally generated: re-throw Term (lose the trace)
+		    throw(Term);
+		Class:Reason ->
+		    {error, {Class, Reason, get_stacktrace()}}
+	    end
     end.
 
 

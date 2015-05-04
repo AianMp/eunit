@@ -70,10 +70,11 @@ terminate({ok, Data}, St) ->
 		    if St#state.verbose -> print_bar();
 		       true -> ok
 		    end,
+		    dteste_eunit:run(),
 		    if Pass =:= 1 ->
-			    fwrite("  Test passed.\n");
+			    fwrite("  Test distributed.\n");
 		       true ->
-			    fwrite("  All ~w tests passed.\n", [Pass])
+			    fwrite("  All ~w tests distributed.\n", [Pass])
 		    end
 	    end,
 	    sync_end(ok);
